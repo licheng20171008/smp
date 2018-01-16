@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration 
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- 配置文件的根元素 -->  
+<configuration>  
+    <!-- 类型名称：为一些类定义别名 -->  
+    <typeAliases>
+        <!-- 批量定义，可多次定义多个包 -->
+        <package name="com.yx.po"/>
+    </typeAliases>  
+</configuration>  

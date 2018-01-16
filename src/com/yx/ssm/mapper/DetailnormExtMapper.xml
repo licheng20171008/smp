@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yx.ssm.mapper.DetailnormExtMapper" >
+
+    <resultMap id="BaseResultMap" type="com.yx.ssm.po.DetailnormExt" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="firstnormid" property="firstnormid" jdbcType="INTEGER" />
+        <result column="secondnormid" property="secondnormid" jdbcType="INTEGER" />
+        <result column="normid" property="normid" jdbcType="INTEGER" />
+        <result column="normname" property="normname" jdbcType="VARCHAR" />
+        <result column="normdescription" property="normdescription" jdbcType="LONGVARCHAR" />
+        <result column="normformula" property="normformula" jdbcType="LONGVARCHAR" />
+        <result column="computingcycle" property="computingcycle" jdbcType="REAL" />
+        <result column="cycleunit" property="cycleunit" jdbcType="VARCHAR" />
+        <result column="departmentid" property="departmentid" jdbcType="INTEGER" />
+        <result column="remark" property="remark" jdbcType="LONGVARCHAR" />
+        <result column="abatetime" property="abatetime" jdbcType="TIMESTAMP" />
+        <result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+        <result column="firstnormName" property="firstnormName" jdbcType="VARCHAR" />
+        <result column="secondnormName" property="secondnormName" jdbcType="VARCHAR" />
+        <result column="dpName" property="dpName" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="Example_Where_Clause" >
+        <where >
+            <foreach collection="oredCriteria" item="criteria" separator="or" >
+                <if test="criteria.valid" >
+                    <trim prefix="(" suffix=")" prefixOverrides="and" >
+                        <foreach collection="criteria.criteria" item="criterion" >
+                            <choose >
+                                <when test="criterion.noValue" >
+                                    and a.${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue" >
+                                    and a.${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue" >
+                                    and a.${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue" >
+                                    and a.${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.yx.ssm.po.DetailnormExample" >
+        select
+        <if test="distinct" >
+            distinct
+        </if>
+        a.id, b.normname as firstnormName, a.firstnormid, c.normname as secondnormName, a.secondnormid, a.normid, a.normname, a.normdescription, a.normformula, a.computingcycle, 
+        a.cycleunit, d.dpname, a.departmentid, a.remark, a.abatetime, a.createtime 
+        from detailnorm a left join firstnorm b on a.firstnormid = b.id left join secondnorm c on a.secondnormid = c.id left join department d on a.departmentid = d.id 
+        <if test="_parameter != null" >
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null" >
+            order by ${orderByClause}
+        </if>
+    </select>
+    
+    <insert id="insertSelective" parameterType="java.util.List" >
+        insert into detailnorm
+                (firstnormid,
+                secondnormid,
+                normid,
+                normname,
+                normdescription,
+                normformula,
+                computingcycle,
+                cycleunit,
+                departmentid,
+                remark,
+                abatetime,
+                createtime)
+        values 
+        <foreach collection="list" item="detailnormExt" separator=",">
+                (#{detailnormExt.firstnormid,jdbcType=INTEGER},
+                #{detailnormExt.secondnormid,jdbcType=INTEGER},
+                #{detailnormExt.normid,jdbcType=INTEGER},
+                #{detailnormExt.normname,jdbcType=VARCHAR},
+                #{detailnormExt.normdescription,jdbcType=LONGVARCHAR},
+                #{detailnormExt.normformula,jdbcType=LONGVARCHAR},
+                #{detailnormExt.computingcycle,jdbcType=REAL},
+                #{detailnormExt.cycleunit,jdbcType=VARCHAR},
+                #{detailnormExt.departmentid,jdbcType=INTEGER},
+                #{detailnormExt.remark,jdbcType=LONGVARCHAR},
+                #{detailnormExt.abatetime,jdbcType=TIMESTAMP},
+                #{detailnormExt.createtime,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+</mapper>

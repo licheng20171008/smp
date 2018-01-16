@@ -1,0 +1,41 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.3.xsd
+        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+
+	<!-- 注解开发的组件扫描 -->
+	<context:component-scan base-package="com.yx.ssm.controller" />
+
+	<!-- mvc注解驱动配置可以代替映射器配置与适配器的配置，同时还加载了JSON解析器等等参数，实际开发推荐使用 -->
+	<mvc:annotation-driven />
+
+	<!-- 视图解析器 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- 前缀 -->
+		<!-- <property name="prefix" value="/jsp/" /> -->
+		<!-- 后缀 -->
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<!-- 全局异常处理器 -->
+	<bean class="com.yx.ssm.exception.CustomExceptionResolver" />
+	
+	<!-- 文件上传 -->
+	<!-- <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> -->
+	    <!-- 设置上传最大尺寸为5M -->
+	    <!-- <property name="maxUploadSize">
+	        <value>5242880</value>
+	    </property>
+	</bean> -->
+</beans>

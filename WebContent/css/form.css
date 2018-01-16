@@ -1,0 +1,7 @@
+@charset "UTF-8";
+/* 定义所有元素的外边距与内边距 */
+* {
+    margin: 0;
+    padding: 0;
+}
+

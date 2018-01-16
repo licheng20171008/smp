@@ -1,0 +1,92 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.3.xsd
+        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+
+	<!-- 加载配置文件 -->
+	<context:property-placeholder location="classpath:db.properties" />
+
+	<!-- 数据源，使用c3p0 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="${jdbc.driver}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="maxPoolSize" value="10" />
+		<property name="minPoolSize" value="5" />
+	</bean>
+
+	<!-- sqlSessionFactory配置 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 加载mybatis的配置文件 -->
+		<property name="configLocation" value="classpath:mybatis/sqlMapConfig.xml" />
+		<!-- 数据源 -->
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- mapper的批量扫描（与上面的配置接口效果一致），同时代替mybatis的mapper注入 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 指定扫描的包名 多个包用半角逗号隔开 -->
+		<property name="basePackage" value="com.yx.ssm.mapper" />
+		<!-- sqlSessionFactory注入 -->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+
+    <!-- 原始DAO配置 -->
+    <bean id="departmentDao" class="com.yx.ssm.service.impl.DepartmentDaoImpl">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    <bean id="firstnormDao" class="com.yx.ssm.service.impl.FirstnormDaoImpl">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    <bean id="secondnormDao" class="com.yx.ssm.service.impl.SecondnormDaoImpl">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    <bean id="detailnormDao" class="com.yx.ssm.service.impl.DetailnormDaoImpl">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+	<!-- 申明式事务控制方法 -->
+	<!-- 事务管理器 mybatis的操作数据库的事务控制，spring使用JDBC的事务控制类 -->
+	<bean id="dataSourceTransactionManager" 
+	    class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<!-- 数据源 在applicationContext-dao.xml中已经进行配置 -->
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 通知，通信,通知给上面的事务管理器，链接ID：dataSourceTransactionManager -->
+	<tx:advice id="txAdvice" transaction-manager="dataSourceTransactionManager">
+		<tx:attributes>
+			<!-- 传播行为,申明式配置不是注解配置 -->
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="find*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="get*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="select*" propagation="SUPPORTS" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- AOP,调用上面的通知 执行service方法，AOP切住切面通知txAdvice，advice-ref引用通知ID，pointcut切点（service切点） -->
+	<aop:config>
+		<aop:advisor advice-ref="txAdvice" pointcut="execution(* com.yx.ssm.service.impl.*.*(..))" />
+	</aop:config>
+
+	<!-- service注入 -->
+	<bean id="departmentService" class="com.yx.ssm.service.impl.DepartmentServiceImpl" />
+	<bean id="detailnormService" class="com.yx.ssm.service.impl.DetailnormServiceImpl" />
+	<bean id="firstnormService" class="com.yx.ssm.service.impl.FirstnormServiceImpl" />
+	<bean id="secondnormService" class="com.yx.ssm.service.impl.SecondnormServiceImpl" />
+</beans>
